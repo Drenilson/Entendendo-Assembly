@@ -50,31 +50,31 @@ São os "comandos" que dizem à CPU o que fazer: mover um valor, somar, comparar
 Vamos detalhar o ciclo mencionado no Módulo 1, agora com os componentes que acabamos de descrever.
 
 ```
-┌─────────────────────────────────────────────┐
-│                                               │
+┌───────────────────────────────────────┐
+│                                              │
 │   1. FETCH                                   │
 │      A CPU busca a próxima instrução na      │
 │      memória, no endereço apontado pelo      │
 │      registrador RIP (Instruction Pointer)   │
-│                                               │
+│                                              │
 │   2. DECODE                                  │
 │      A CPU interpreta os bytes lidos e       │
 │      identifica: qual operação é, quais são  │
 │      os operandos (registradores? memória?   │
 │      valores constantes?)                    │
-│                                               │
+│                                              │
 │   3. EXECUTE                                 │
 │      A unidade de execução realiza a         │
 │      operação: lê os operandos, calcula ou   │
 │      move o que for necessário, escreve o    │
 │      resultado                               │
-│                                               │
+│                                              │
 │   4. RIP avança                              │
 │      RIP passa a apontar para a próxima      │
 │      instrução (ou para outro endereço, se   │
 │      a instrução foi um desvio/jump)         │
-│                                               │
-└─────────────────────────────────────────────┘
+│                                              │
+└───────────────────────────────────────┘
          │
          └──────────► volta ao passo 1
 ```
@@ -151,4 +151,5 @@ Essas três perguntas, repetidas instrução por instrução, são o núcleo do 
 ---
 
 *Módulo anterior: [Módulo 1 — O que é Assembly](./01-o-que-e-assembly.md)*
+
 *Próximo módulo: [Módulo 3 — Registradores](./03-registradores.md)*
