@@ -74,6 +74,85 @@ Em sintaxe Intel/NASM, hexadecimal costuma ser escrito com prefixo `0x` (ex.: `0
 
 Ao ler `mov eax, 0x2A`, você deve conseguir reconhecer rapidamente que `0x2A` equivale a 42 em decimal — mas, mais importante que a conversão exata, é entender que hexadecimal é apenas **outra forma de escrever o mesmo valor binário**, mais compacta e mais fácil de mapear para bytes.
 
+## 4.1 Convertendo entre hexadecimal, decimal e binário
+
+**Hexadecimal → Decimal**
+
+Cada posição em hexadecimal vale uma potência de 16, da direita para a esquerda (16⁰, 16¹, 16², ...). Basta multiplicar cada dígito pelo seu peso posicional e somar.
+
+```
+0x2A = (2 × 16¹) + (A × 16⁰)
+     = (2 × 16) + (10 × 1)
+     = 32 + 10
+     = 42
+```
+
+Outro exemplo, com 3 dígitos:
+
+```
+0x1F4 = (1 × 16²) + (F × 16¹) + (4 × 16⁰)
+      = (1 × 256) + (15 × 16) + (4 × 1)
+      = 256 + 240 + 4
+      = 500
+```
+
+**Decimal → Hexadecimal**
+
+Divide-se repetidamente por 16, guardando o resto de cada divisão. O hexadecimal é formado lendo os restos de baixo para cima.
+
+```
+42 ÷ 16 = 2  resto 10 (A)
+ 2 ÷ 16 = 0  resto 2
+
+Lendo de baixo para cima: 2A  →  0x2A
+```
+
+**Hexadecimal ↔ Binário (o caminho mais rápido)**
+
+Você raramente vai querer converter hex→decimal→binário passando por decimal — é mais trabalho que o necessário. Como cada dígito hex corresponde a exatamente 4 bits (Seção 4), a conversão é direta, dígito por dígito:
+
+```
+Hex:     2    A
+Binário: 0010 1010
+```
+
+E o caminho inverso: agrupe o binário em blocos de 4 bits (a partir da direita) e converta cada bloco separadamente.
+
+```
+Binário: 1101 1110
+Blocos:  1101 = D    1110 = E
+Hex:     0xDE
+```
+
+Tabela de referência rápida (os 16 dígitos hex):
+
+| Hex | Binário | Decimal | Hex | Binário | Decimal |
+|---|---|---|---|---|---|
+| 0 | 0000 | 0 | 8 | 1000 | 8 |
+| 1 | 0001 | 1 | 9 | 1001 | 9 |
+| 2 | 0010 | 2 | A | 1010 | 10 |
+| 3 | 0011 | 3 | B | 1011 | 11 |
+| 4 | 0100 | 4 | C | 1100 | 12 |
+| 5 | 0101 | 5 | D | 1101 | 13 |
+| 6 | 0110 | 6 | E | 1110 | 14 |
+| 7 | 0111 | 7 | F | 1111 | 15 |
+
+> Na prática, ao ler Assembly, o caminho hex↔binário é o que você vai usar o tempo todo (para visualizar flags, máscaras de bits, endereços). O caminho hex↔decimal é mais para entender "quanto vale esse número na vida real".
+
+**Exercícios extras (Nível 1)**
+
+10. Converta 0x7C para decimal usando o método posicional.
+11. Converta 100 (decimal) para hexadecimal usando divisões sucessivas.
+12. Converta 0xB6 diretamente para binário (sem passar por decimal).
+13. Converta 1010 0011 (binário) diretamente para hexadecimal.
+
+**Respostas**
+
+10. 0x7C = (7×16) + (12×1) = 112 + 12 = 124
+11. 100 ÷ 16 = 6 resto 4 → 0x64
+12. 0xB6 = B(1011) 6(0110) → 1011 0110
+13. 1010 0011 → A(1010) 3(0011) → 0xA3
+
 ## 5. Números negativos: complemento de dois
 
 Registradores e posições de memória não têm um "sinal" embutido nos bits — eles são apenas sequências de 0s e 1s. A **interpretação** de um valor como positivo ou negativo depende inteiramente de como a instrução trata esses bits.
@@ -131,9 +210,9 @@ Isso será revisitado no Módulo 5, quando lidarmos com leitura e escrita direta
 
 ## 7. Relação com tipos do C
 
-Você mencionou que está estudando C simultaneamente — então vale conectar os conceitos, com uma ressalva importante logo de início:
+Tipo em C é um conceito de linguagem de alto nível, usado porque o programador humano precisa pensar em termos de significado — "isso é um caractere", "isso é um contador", "isso é um endereço" — sem se preocupar, a cada linha, em quantos bytes aquilo ocupa ou como a CPU vai interpretar os bits. Em Assembly, esse significado já desapareceu: o que resta é apenas quantos bytes estão sendo manipulados e como essa operação específica os interpreta (signed/unsigned, por exemplo).
 
-> **Tipo em C e tamanho de dado em Assembly são conceitos relacionados, mas não idênticos.** Um tipo em C carrega significado sobre *o que aquele valor representa* (é um caractere? um contador? um endereço?), enquanto em Assembly o que existe é apenas *quantos bytes* estão sendo manipulados e *como* essa operação específica os interpreta (signed/unsigned, por exemplo). O compilador é quem faz essa ponte.
+Tipo e tamanho são conceitos relacionados, mas não idênticos — tipo é uma abstração para humanos; tamanho é uma instrução para a CPU. O compilador é quem faz essa ponte, traduzindo a camada de significado (tipo) para a camada de mecânica pura (tamanho) que o processador entende.
 
 Ainda assim, na prática (em Linux x86-64, com GCC), a correspondência de tamanhos costuma ser:
 
