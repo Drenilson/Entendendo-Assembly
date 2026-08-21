@@ -40,13 +40,13 @@ RAX (64 bits)
 Visualmente, pensando em RAX como 8 bytes lado a lado:
 
 ```
- byte7  byte6  byte5  byte4  byte3  byte2  byte1  byte0
+  byte7   byte6    byte5   byte4   byte3    byte2   byte1   byte0
 ┌──────┬──────┬──────┬──────┬──────┬──────┬──────┬──────┐
-│      │      │      │      │      │      │  AH  │  AL  │
+│       │       │       │       │       │       │   AH   │  AL   │
 └──────┴──────┴──────┴──────┴──────┴──────┴──────┴──────┘
-└─────────────────────┬─────────────────────┘└───┬───┘
-                      EAX                        AX
-└───────────────────────────── RAX ─────────────────────────────┘
+└─────────────────────┬──────────────────┘└──────┬──────┘
+                         EAX                        AX
+└────── RAX ─────────────────────────────────────────────┘
 ```
 
 **Por que isso existe?** Motivo histórico e prático: a arquitetura x86 evoluiu ao longo de décadas.
@@ -63,7 +63,7 @@ Se você escrever:
 
 ```asm
 mov rax, 0x1122334455667788
-mov al, 0xFF
+mov al,  0xFF
 ```
 
 Depois da segunda instrução, apenas o **byte menos significativo** de RAX foi alterado. RAX passa a valer `0x11223344556677FF` — o resto permanece como estava.
@@ -187,4 +187,5 @@ mov ch, 0x00
 ---
 
 *Módulo anterior: [Módulo 2 — Modelo Mental da CPU](./02-modelo-mental-da-cpu.md)*
+
 *Próximo módulo: [Módulo 4 — Dados](./04-dados.md)*
