@@ -107,6 +107,41 @@ Divide-se repetidamente por 16, guardando o resto de cada divisão. O hexadecima
 Lendo de baixo para cima: 2A  →  0x2A
 ```
 
+**Método rápido para encontrar o resto**
+
+> 1ª divisão
+```
+42 ÷ 16 = 2,625
+Truncando → 2
+```
+```
+16 × 2 = 32
+42 − 32 = 10 → A
+```
+> 2ª divisão
+```
+2 ÷ 16 = 0,125
+Truncando → 0
+```
+```
+16 × 0 = 0
+2 − 0 = 2
+
+Quociente = 0 → fim
+```
+> Restos obtidos:
+```
+A → 2
+```
+> Invertendo:
+```
+2A
+```
+> Portanto:
+```
+42 = 0x2A
+```
+
 **Hexadecimal ↔ Binário (o caminho mais rápido)**
 
 Você raramente vai querer converter hex→decimal→binário passando por decimal — é mais trabalho que o necessário. Como cada dígito hex corresponde a exatamente 4 bits (Seção 4), a conversão é direta, dígito por dígito:
