@@ -10,12 +10,13 @@ Se você já olhou para um código Assembly e sentiu aquele misto de "uau" e "so
 
 ## 🎯 Pra quem é esse guia?
 
-- 👨‍💻 Quem estuda C e quer entender o que o compilador faz "por baixo dos panos"
+- 👨‍💻 Programadores que desejam entender o que o compilador faz "por baixo dos panos"
 - 🕵️ Quem quer conseguir ler um `objdump` sem entrar em pânico
 - 🧩 Quem gosta de entender sistemas de verdade, camada por camada
 - 🐧 Curiosos de plantão que topam uma jornada em Linux, x86-64, ABI System V e sintaxe Intel
 
 Não é necessário nenhum conhecimento prévio de Assembly — só uma boa dose de curiosidade (e talvez um café ☕).
+Lembrando que a linguagem C é a linguagem escolhida para usar como referência na programação de alto nível.
 
 ---
 
