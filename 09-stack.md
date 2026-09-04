@@ -33,7 +33,7 @@ Esta seção existe para resolver, com números concretos, uma confusão extrema
 Esqueça, por um momento, qualquer desenho ou imagem. Vamos só seguir números. Suponha que, antes de qualquer `push`, `RSP` valha `0x2000`.
 
 ```asm
-mov rsp, 0x2000   ; estado inicial, hipotético
+mov rsp, 0x2000    ; estado inicial, hipotético
 push rax           ; suponha RAX = 5
 push rbx           ; suponha RBX = 10
 ```
@@ -69,13 +69,13 @@ Uma vez que fixamos os números (Seção 3.1) como a fonte de verdade, qualquer 
 Para evitar ambiguidade, este curso vai usar sempre a mesma convenção de desenho: **endereços mais altos ficam no topo do diagrama; endereços mais baixos ficam embaixo** (é a forma mais comum em material de sistemas operacionais e depuradores). Usando os números da Seção 3.1:
 
 ```
-0x2000  ┌─────────────────────────────┐  ← endereço mais alto (região "livre", ainda não usada pela stack)
+0x2000  ┌────────────────────────── ← endereço mais alto (região "livre", ainda não usada pela stack)
         │  (memória não usada ainda)   │
-0x1FF8  ├─────────────────────────────┤
+0x1FF8  ├──────────────────────────
         │   5   (empilhado por RAX)    │
-0x1FF0  ├─────────────────────────────┤  ← RSP aponta aqui (topo atual, após os dois pushes)
+0x1FF0  ├──────────────────────────
         │  10   (empilhado por RBX)    │
-        └─────────────────────────────┘
+        └────────────────────────── ← RSP aponta aqui (topo atual, após os dois pushes)
                        │
                        ▼
               endereços mais baixos
@@ -91,21 +91,19 @@ Para dar um contexto mais concreto (sem entrar em detalhes que fogem do escopo d
 
 ```
 Endereços mais altos
-        ┌─────────────────────────────┐
+        ┌──────────────────────────
         │      (espaço do kernel)      │
-        ├─────────────────────────────┤
-        │            stack             │  ← cresce para baixo (Seção 3.1)
-        │              ↓                │
-        ├─────────────────────────────┤
+        ├──────────────────────────
+        │           ↓ stack ↓          │  ← cresce para baixo (Seção 3.1)
+        ├──────────────────────────
         │     (região não mapeada)     │
-        ├─────────────────────────────┤
-        │              ↑                │
-        │             heap              │  ← cresce para cima (endereços aumentando)
-        ├─────────────────────────────┤
+        ├──────────────────────────
+        │           ↑ heap  ↑          │  ← cresce para cima (endereços aumentando)
+        ├──────────────────────────
         │       dados do programa      │
-        ├─────────────────────────────┤
+        ├──────────────────────────
         │      código do programa      │
-        └─────────────────────────────┘
+        └──────────────────────────
 Endereços mais baixos
 ```
 
@@ -132,9 +130,9 @@ Praticamente toda função compilada segue um padrão fixo no início (**prólog
 ### 6.1 Prólogo
 
 ```asm
-push rbp        ; salva o RBP da função anterior (quem chamou esta função)
+push rbp         ; salva o RBP da função anterior (quem chamou esta função)
 mov rbp, rsp     ; RBP passa a apontar para o topo atual: início do novo frame
-sub rsp, N        ; reserva N bytes de espaço na stack para variáveis locais
+sub rsp, N       ; reserva N bytes de espaço na stack para variáveis locais
 ```
 
 Passo a passo:
@@ -146,9 +144,9 @@ Passo a passo:
 ### 6.2 Epílogo
 
 ```asm
-mov rsp, rbp     ; descarta o espaço reservado para variáveis locais
+mov rsp, rbp      ; descarta o espaço reservado para variáveis locais
 pop rbp           ; restaura o RBP da função anterior
-ret                ; retorna para quem chamou (Módulo 10 detalha essa instrução)
+ret               ; retorna para quem chamou (Módulo 10 detalha essa instrução)
 ```
 
 Passo a passo:
@@ -173,15 +171,15 @@ Vamos aplicar o mesmo estilo de acompanhamento numérico da Seção 3.1, agora a
 Usando a mesma convenção de desenho da Seção 3.3 (endereço mais alto em cima):
 
 ```
-0x3000  ┌─────────────────────────────┐  ← RSP estava aqui, antes do prólogo
+0x3000  ┌──────────────────────────  ← RSP estava aqui, antes do prólogo
         │   (memória de outra função)  │
-0x2FF8  ├─────────────────────────────┤  ← RBP aponta aqui (RBP antigo, 0x5000, foi salvo neste endereço)
+0x2FF8  ├──────────────────────────  ← RBP aponta aqui (RBP antigo, 0x5000, foi salvo neste endereço)
         │   0x5000  (RBP antigo)       │
-0x2FE8  ├─────────────────────────────┤  ← RSP aponta aqui, após "sub rsp, 16"
+0x2FE8  ├────────────────────────── 
         │   espaço reservado (16       │
         │   bytes) para variáveis      │
         │   locais desta função        │
-        └─────────────────────────────┘
+        └──────────────────────────  ← RSP aponta aqui, após "sub rsp, 16"
 ```
 
 Repare que `RBP` ficou parado em `0x2FF8` assim que foi definido, e vai continuar ali durante toda a função, mesmo que `RSP` continue se movendo (por exemplo, se a função fizer mais `push`s internamente). É exatamente essa estabilidade que permite usar `[rbp-4]`, `[rbp-8]` como referências fixas para as variáveis locais reservadas nesses 16 bytes.
@@ -222,12 +220,12 @@ Um Assembly plausível (levemente simplificado, sem otimizações de compilador)
 
 ```asm
 soma:
-    push rbp             ; PRÓLOGO
+    push rbp                   ; PRÓLOGO
     mov rbp, rsp
     sub rsp, 16
 
-    mov dword [rbp-4], edi   ; a (chega via registrador, Módulo 10) é guardado na stack
-    mov dword [rbp-8], esi   ; b (idem) é guardado na stack
+    mov dword [rbp-4], edi     ; a (chega via registrador, Módulo 10) é guardado na stack
+    mov dword [rbp-8], esi     ; b (idem) é guardado na stack
 
     mov eax, dword [rbp-4]     ; PROCESSAMENTO
     add eax, dword [rbp-8]
@@ -235,7 +233,7 @@ soma:
 
     mov eax, dword [rbp-12]    ; SAÍDA: valor de retorno vai em EAX
 
-    mov rsp, rbp          ; EPÍLOGO
+    mov rsp, rbp               ; EPÍLOGO
     pop rbp
     ret
 ```
