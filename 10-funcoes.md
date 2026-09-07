@@ -74,12 +74,12 @@ Ao executar `call soma`:
 2. `RIP` passa a apontar para o início da função `soma`, seja lá onde essa função estiver localizada na memória, sua posição no arquivo-fonte não influencia esse endereço, que é resolvido pelo assembler/linker.
 
 ```
-0x4000  ┌─────────────────────────────┐  ← RSP estava aqui, antes do call
+0x4000  ┌──────────────────────────  ← RSP estava aqui, antes do call
         │   (memória de outra função)  │
-0x3FF8  ├─────────────────────────────┤  ← RSP aponta aqui, depois do call
+0x3FF8  ├──────────────────────────  ← RSP aponta aqui, depois do call
         │   0x1005  (endereço de       │
         │   retorno, empilhado)        │
-        └─────────────────────────────┘
+        └──────────────────────────
 ```
 
 > **`call` é, na prática, um `push` do endereço de retorno seguido de um `jmp`.** Fixar essa equivalência ajuda bastante a entender o que vem a seguir: `ret`.
@@ -118,10 +118,10 @@ ret
 Supondo que, ao final da função `soma`, a stack esteja exatamente como no diagrama da Seção 3 (o epílogo do Módulo 9 já devolveu `RSP` e `RBP` ao estado correto, sobrando apenas o endereço de retorno no topo):
 
 ```
-0x3FF8  ┌─────────────────────────────┐  ← RSP aponta aqui, antes do ret
+0x3FF8  ┌────────────────────────── ← RSP aponta aqui, antes do ret
         │   0x1005  (endereço de       │
         │   retorno)                   │
-        └─────────────────────────────┘
+        └──────────────────────────
 ```
 
 Ao executar `ret`:
@@ -156,9 +156,9 @@ int resultado = soma(3, 4);
 ```
 
 ```asm
-mov edi, 3       ; primeiro argumento (a)
-mov esi, 4       ; segundo argumento (b)
-call soma         ; empilha endereço de retorno, desvia para 'soma'
+mov edi, 3            ; primeiro argumento (a)
+mov esi, 4            ; segundo argumento (b)
+call soma             ; empilha endereço de retorno, desvia para 'soma'
 mov [resultado], eax  ; usa o valor de retorno, já em EAX
 ```
 
@@ -200,8 +200,8 @@ RAX, RCX, RDX, RSI, RDI, R8, R9, R10, R11
 **Exemplo do problema que isso pode causar, se ignorado:**
 
 ```asm
-mov ecx, 99          ; ECX guarda um valor importante para o código atual
-call alguma_funcao    ; alguma_funcao pode usar ECX livremente, sem avisar
+mov ecx, 99            ; ECX guarda um valor importante para o código atual
+call alguma_funcao     ; alguma_funcao pode usar ECX livremente, sem avisar
 add eax, ecx           ; PERIGO: ECX pode não valer mais 99 aqui
 ```
 
@@ -209,7 +209,7 @@ Se `alguma_funcao` usar `ECX` internamente (o que ela tem todo o direito de faze
 
 ```asm
 mov ecx, 99
-push rcx              ; salva ECX/RCX antes da chamada
+push rcx               ; salva ECX/RCX antes da chamada
 call alguma_funcao
 pop rcx                ; restaura o valor original
 add eax, ecx
@@ -233,7 +233,7 @@ Ao ler uma função, encontrar `push rbx` logo no início (além do `push rbp` j
 minha_funcao:
     push rbp
     mov rbp, rsp
-    push rbx        ; RBX será usado aqui dentro, então seu valor original é preservado
+    push rbx         ; RBX será usado aqui dentro, então seu valor original é preservado
 
     ; ... uso de RBX no corpo da função ...
 
@@ -345,7 +345,7 @@ Uma função pode reservar espaço para variáveis locais apenas com `sub rsp, N
 ```asm
 funcao_sem_rbp:
     sub rsp, 16
-    mov dword [rsp], edi     ; variável local, referenciada via RSP diretamente
+    mov dword [rsp], edi      ; variável local, referenciada via RSP diretamente
     ; ... corpo da função ...
     add rsp, 16
     ret
