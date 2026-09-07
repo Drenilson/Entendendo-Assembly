@@ -292,7 +292,40 @@ Ao encontrar uma função Assembly desconhecida, este processo ajuda a organizá
 - **Assumir que todo `[rbp-N]` representa exatamente uma variável de C.** Compiladores podem reorganizar, combinar ou até eliminar variáveis locais durante otimização; o número de deslocamentos distintos é uma pista, não uma garantia exata de correspondência 1 para 1 com o código-fonte.
 - **Ignorar o `leave`** por não reconhecer a instrução: lembrar que ela é apenas um atalho para `mov rsp, rbp` seguido de `pop rbp`.
 
-## 12. Tabela-resumo
+## 12. Alinhamento da Stack
+
+Além de armazenar dados, a stack também possui requisitos de alinhamento.
+
+Na ABI System V AMD64, o `RSP`deve estar alinhado corretamente antes que uma função seja chamada com `call`.
+
+Isso é importante principalmente quando uma função precisa chamar outra função.
+
+Por exemplo:
+```
+call funcao
+```
+O `call` coloca o endereço de retorno na stack antes de transferir o controle.
+Por isso, o valor de `RSP` observado dentro da função chamada é diferente daquele existente imediatamente antes do `call`.
+
+O alinhamento correto permite que funções mantenham a convenção esperada pela ABI e evita problemas quando determinadas instruções ou dados exigem endereços alinhados.
+
+Por esse motivo, podemos encontrar instruções como:
+```
+sub rsp, 8
+```
+ou:
+```
+sub rsp, 16
+```
+mesmo quando aparentemente não existe uma grande quantidade de dados locais para armazenar.
+
+Nesse caso, a alteração de `RSP` pode estar relacionada ao alinhamento da stack, e não somente à reserva de espaço para variáveis.
+
+Ao analisar Assembly produzido por compiladores, portanto, não devemos assumir que todo `sub rsp, X` existe apenas para armazenar variáveis locais.
+
+Ele também pode fazer parte do controle do alinhamento exigido pela ABI.
+
+## 13. Tabela-resumo
 
 | Elemento | Papel |
 |---|---|
@@ -304,7 +337,7 @@ Ao encontrar uma função Assembly desconhecida, este processo ajuda a organizá
 | `[rbp+N]` | Argumento vindo pela stack (deslocamento positivo, acima do frame atual) |
 | Stack frame | A região entre `RBP` e `RSP` pertencente à chamada de função atual |
 
-## 13. Exercícios
+## 14. Exercícios
 
 ### Nível 1 — Conceitual
 
@@ -381,7 +414,7 @@ fim:
 
 ---
 
-## 14. Respostas
+## 15. Respostas
 
 1. Porque `RSP` muda a cada `push`, `pop`, ou qualquer alocação/desalocação temporária de espaço durante a execução da função, tornando qualquer deslocamento relativo a ele instável. `RBP` é definido uma única vez, no prólogo, e permanece fixo até o epílogo, servindo como um ponto de referência confiável durante toda a função.
 2. Substitui as duas instruções `mov rsp, rbp` (descartar o espaço reservado para variáveis locais) seguida de `pop rbp` (restaurar o RBP da função anterior).
