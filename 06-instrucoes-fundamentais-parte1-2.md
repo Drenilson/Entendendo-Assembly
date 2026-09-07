@@ -137,7 +137,7 @@ push origem
 
 ### O que muda
 
-- `RSP` diminui em 8 (em modo 64 bits, `push` sempre trabalha com blocos de 8 bytes/qword, mesmo que o valor "lógico" seja menor).
+- Em modo 64-bit, o tamanho padrão de `push` é 8 bytes. Também existem formas que utilizam operand-size de 16 bits.
 - O valor de `origem` é escrito no endereço de memória agora apontado por `RSP`.
 
 ### Exemplo comentado
